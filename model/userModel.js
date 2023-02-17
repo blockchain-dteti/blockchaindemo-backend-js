@@ -4,6 +4,9 @@ const db = require('../config/database');
 const { DataTypes } = Sequelize;
 
 const users = db.define('users', {
+    email: {
+        type: DataTypes.STRING
+    },
     name: {
         type: DataTypes.STRING
     },
