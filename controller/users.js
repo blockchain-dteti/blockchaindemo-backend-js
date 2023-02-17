@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 exports.getUser = async (req, res) => {
     try {
         const user = await users.findAll({
-            attributes: ['id', 'name']
+            attributes: ['id', 'email', 'name']
         });
         res.json(user)
     } catch (error) {
@@ -14,7 +14,7 @@ exports.getUser = async (req, res) => {
 };
 
 exports.newUser = async (req, res) => {
-    const { name, password, role } = req.body
+    const { name, password, role, email } = req.body
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(password, salt)
     try {
@@ -22,6 +22,7 @@ exports.newUser = async (req, res) => {
             name: name,
             password: hashPassword,
             role: role,
+            email: email
         });
         res.json({ msg: "User Ditambahkan" })
     } catch (error) {
@@ -33,13 +34,14 @@ exports.login = async (req, res) => {
     try {
         const user = await users.findAll({
             where: {
-                name: req.body.name
+                email: req.body.email
             }
         });
         const match = await bcrypt.compare(req.body.password, user[0].password)
         if (!match) res.status(400).json({ msg: "Password tidak sesuai" })
         const userId = user[0].id
         const name = user[0].name
+        const email = user[0].email
         const accessToken = jwt.sign({ userId, name }, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: '20s'
         })

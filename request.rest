@@ -2,8 +2,23 @@ POST http://localhost:5000/api/account/users
 Content-Type: application/json
 
 {
-    "name": "Sikat",
+    "name": "Bikat",
     "password": "restan",
-    "role": "DO"
+    "role": "DO",
+    "email" : "rikat@gmail.com"
     
 }
+
+###
+POST http://localhost:5000/api/account/login
+Content-Type: application/json
+
+{
+    "email": "rikat@gmail.com",
+    "password": "restan"
+}
+
+###
+GET http://localhost:5000/api/account/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJuYW1lIjoiQmlrYXQiLCJpYXQiOjE2NzY2MjUxMDAsImV4cCI6MTY3NjYyNTEyMH0.jCKXHrJe2raOqH5MnRKYxXmpGz-CrpLkLobAB5fAdW0
+
