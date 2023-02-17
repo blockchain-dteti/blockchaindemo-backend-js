@@ -1,0 +1,9 @@
+POST http://localhost:5000/api/account/users
+Content-Type: application/json
+
+{
+    "name": "Sikat",
+    "password": "restan",
+    "role": "DO"
+    
+}

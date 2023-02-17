@@ -1,56 +1,57 @@
-const {Sequelize} = require('sequelize');
+const { Sequelize } = require('sequelize');
 const db = require('../config/database');
 
-const {DataTypes} = Sequelize;
+const { DataTypes } = Sequelize;
 
 const deliveryOrder = db.define('deliveryOrders', {
-    bl_number:{
+    bl_number: {
         type: DataTypes.STRING
     },
-    do_number:{
+    do_number: {
         type: DataTypes.STRING
     },
-    expiry_date:{
+    expiry_date: {
         type: DataTypes.DATE
     },
-    vessel_name:{
+    vessel_name: {
         type: DataTypes.STRING
     },
-    voyage_number:{
+    voyage_number: {
         type: DataTypes.STRING
     },
-    shipping_agency:{
+    shipping_agency: {
         type: DataTypes.STRING
     },
-    notify_party:{
+    notify_party: {
         type: DataTypes.STRING
     },
-    consignee:{
+    consignee: {
         type: DataTypes.STRING
     },
-    shipper:{
+    shipper: {
         type: DataTypes.STRING
     },
-    port_of_loading:{
+    port_of_loading: {
         type: DataTypes.STRING
     },
-    port_of_discharge:{
+    port_of_discharge: {
         type: DataTypes.STRING
     },
-    place_of_delivery:{
+    place_of_delivery: {
         type: DataTypes.STRING
     },
-    size_type:{
+    size_type: {
         type: DataTypes.STRING
     },
-    gross_weight:{
+    gross_weight: {
         type: DataTypes.FLOAT
     },
-    depo_name:{
+    depo_name: {
         type: DataTypes.STRING
     },
 }, {
-    freezeTableName: true
+    freezeTableName: true,
+    timestamps: false
 })
 
 module.exports = deliveryOrder;
