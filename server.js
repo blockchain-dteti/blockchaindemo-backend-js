@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const db = require('./config/database');
 const route = require('./routes/loginRouter')
+const item = require('./routes/doRouter')
 const client = require('./database/client');
 const depo = require('./model/depoModel')
 const delv = require('./model/deliveryOrderModel')
@@ -33,6 +34,7 @@ app.use(express.json());
 
 
 app.use('/api/account', route)
+app.use('/api/item', item)
 
 app.listen(5000, () => {
     console.log('Server is running')
