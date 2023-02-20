@@ -1,0 +1,50 @@
+import notifications from '../model/notificationModel';
+
+exports.getNotifications = async (req, res) => {
+    try {
+        const notifications = await notifications.findAll({
+        attributes: ["userID"],
+        });
+        res.json(notifications);
+    } catch (error) {
+        console.log(error);
+    }
+    };
+
+    exports.newNotifications = async (req, res) => {
+    const { userID, notificationsType, message, time } = req.body;
+    try {
+        await notifications.create({
+        userID: userID,
+        notificationsType: notificationsType,
+        message: message,
+        time: time,
+        });
+        res.json({ msg: "Notifications Ditambahkan" });
+    }
+    catch {
+        console.log(error);
+    }
+    };
+
+    exports.updateNotifications = async (req, res) => {
+    const { id, userID, notificationsType, message, time } = req.body;
+    try {
+        await notifications.update(
+        {
+            userID: userID,
+            notificationsType: notificationsType,
+            message: message,
+            time: time,
+        },
+        {
+            where: {
+            id: id,
+            },
+        }
+        );
+        res.json({ msg: "Notifications Diupdate" });
+    }
+    catch {
+        console.log(error);
+    }
