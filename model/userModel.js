@@ -17,7 +17,7 @@ const users = db.define('users', {
         type: DataTypes.TEXT
     },
     role: {
-        type: DataTypes.ENUM('SL', 'DO')
+        type: DataTypes.ENUM('SL', 'CO')
     }
 }, {
     freezeTableName: true

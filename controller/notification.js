@@ -7,7 +7,7 @@ exports.getNotifications = async (req, res) => {
         });
         res.json(notifications);
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
     };
 
@@ -22,8 +22,8 @@ exports.getNotifications = async (req, res) => {
         });
         res.json({ msg: "Notifications Ditambahkan" });
     }
-    catch {
-        console.log(error);
+    catch (error) {
+        console.error(error);
     }
     };
 
@@ -45,6 +45,7 @@ exports.getNotifications = async (req, res) => {
         );
         res.json({ msg: "Notifications Diupdate" });
     }
-    catch {
-        console.log(error);
+    catch (error) {
+        console.error(error);
     }
+}

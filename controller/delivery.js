@@ -22,6 +22,6 @@ exports.newDO = async (req, res) => {
         });
         res.json({ msg: "DO Ditambahkan" })
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }

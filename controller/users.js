@@ -9,7 +9,7 @@ exports.getUser = async (req, res) => {
         });
         res.json(user)
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 };
 
@@ -26,7 +26,8 @@ exports.newUser = async (req, res) => {
         });
         res.json({ msg: "User Ditambahkan" })
     } catch (error) {
-        console.log(error)
+        console.error(error)
+        res.status(500).json({ msg: error.toString() })
     }
 }
 
@@ -42,6 +43,7 @@ exports.login = async (req, res) => {
         const userId = user[0].id
         const name = user[0].name
         const email = user[0].email
+        const role = user[0].role
         const accessToken = jwt.sign({ userId, name }, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: '20s'
         })
@@ -58,8 +60,9 @@ exports.login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000
         })
         res.json({ accessToken, role })
-    } catch {
-        res.status(404).json({ msg: "Username tidak ditemukan" })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ msg: error.toString() })
     }
 }
 
