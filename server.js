@@ -11,6 +11,8 @@ const item = require('./routes/doRouter')
 const client = require('./database/client');
 const depo = require('./model/depoModel')
 const delv = require('./model/deliveryOrderModel')
+const port = require('./model/portModel')
+const shipping = require('./model/shippingAgency')
 
 
 const app = express();
