@@ -8,6 +8,7 @@ const cors = require('cors')
 const db = require('./config/database');
 const route = require('./routes/loginRouter')
 const item = require('./routes/doRouter')
+const notificationRoute = require('./routes/notificationRouter')
 const client = require('./database/client');
 const depo = require('./model/depoModel')
 const delv = require('./model/deliveryOrderModel')

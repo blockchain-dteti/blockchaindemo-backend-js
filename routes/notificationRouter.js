@@ -5,8 +5,8 @@ const {getNotifications, newNotifications, updateNotifications} = require('../co
 const route = express.Router()
 
 route.get('/notifications', getNotifications)
-route.post('/notifications', newNotifications)
-route.put('/notifications', updateNotifications)
+//route.post('/notifications', newNotifications)
+//route.put('/notifications', updateNotifications)
 
 
 
