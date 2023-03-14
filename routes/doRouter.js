@@ -1,8 +1,9 @@
-const express = require('express');
-const { newDO } = require('../controller/delivery')
+const express = require("express");
+const { newDO, getDOs } = require("../controller/delivery");
 
-const route = express.Router()
+const route = express.Router();
 
-route.post('/item', newDO)
+route.post("", newDO);
+route.get("", getDOs);
 
 module.exports = route;

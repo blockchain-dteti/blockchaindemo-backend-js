@@ -1,97 +1,167 @@
-const deliveryOrder = require('../model/deliveryOrderModel')
-const depo = require('../model/depoModel')
-const port = require('../model/portModel')
-const shipping = require('../model/shippingAgency')
-const { ThirdwebSDK } = require("@thirdweb-dev/sdk/evm");
+const { DeliveryOrder } = require("../model/deliveryOrderModel");
+const { Company } = require("../model/companyModel");
+const { Port } = require("../model/portModel");
+const { ShippingAgency } = require("../model/shippingAgency");
+const { Container } = require("../model/containerModel");
+const SmartContract = require("../service/thirdweb");
+const moment = require("moment");
+const { randomString } = require("../helper/random");
 
 exports.newDO = async (req, res) => {
-    const { bl_number, do_number, expiry_date, vessel_name, voyage_number, shipping_agency, notify_party, consignee, shipper, port_of_loading, port_of_discharge, place_of_delivery, size_type, gross_weight, depo_name } = req.body
-    const container = { voyage_number: voyage_number, size_type: size_type, gross_weight: gross_weight, depo_name: depo_name }
-    try {
-        await deliveryOrder.create({
-            bl_number: bl_number,
-            do_number: do_number,
-            expiry_date: expiry_date,
-            vessel_name: vessel_name,
-            voyage_number: voyage_number,
-            shipping_agency: shipping_agency,
-            notify_party: notify_party,
-            consignee: consignee,
-            shipper: shipper,
-            port_of_loading: port_of_loading,
-            port_of_discharge: port_of_discharge,
-            place_of_delivery: place_of_delivery,
-            container: container
+  const {
+    shippingAgencyId,
+    notifyPartyId,
+    consigneeId,
+    shipperId,
+    portOfDischargeId,
+    portOfDeliveryId,
+    portOfLoadingId,
+    containers,
+  } = req.body;
+  try {
+    const doNumber = randomString(10);
+    const blNumber = randomString(14);
+    const voyageNumber = randomString(4);
+    const vessel = "XIN YANG PU";
+    const doExpiredDate = moment().add(1, "month");
+
+    const shippingAgencyData = await ShippingAgency.findByPk(shippingAgencyId);
+    const notifyPartyData = await Company.findByPk(notifyPartyId);
+    const consigneeData = await Company.findByPk(consigneeId);
+    const shipperData = await Company.findByPk(shipperId);
+    const portOfDischargeData = await Port.findByPk(portOfDischargeId);
+    const portOfDeliveryData = await Port.findByPk(portOfDeliveryId);
+    const portOfLoadingData = await Port.findByPk(portOfLoadingId);
+
+    const containersModelData = [];
+    const containersData = await Promise.all(
+      containers.map(async (container) => {
+        const depoData = await Company.findByPk(container.depoId);
+        const containerData = {
+          containerNumber: randomString(11),
+          sealNumber: randomString(8),
+          sizeType: container.sizeType,
+          grossWeight: container.grossWeight,
+          depoName: depoData.name,
+          phoneNumber: depoData.phoneNumber,
+        };
+        containersModelData.push({
+          containerNo: containerData.containerNumber,
+          sealNo: containerData.sealNumber,
+          sizeType: container.sizeType,
+          grossWeight: container.grossWeight,
+          depoId: container.depoId,
         });
-        const sdk = new ThirdwebSDK("avalanche-fuji");
-        const contract = await sdk.getContract("0x1a9CDeBF5c7434F0B65C6Ea8aedA31506902dF9b");
-        const data = await contract.call("createRequestDO", do_number, shipping_agency, "0x24D5c12a26d13e13014C985B69487d823A61A896", notify_party, shipper, consignee, port_of_loading, port_of_discharge, place_of_delivery, container)
-        res.json({ msg: "DO Ditambahkan" })
-    } catch (error) {
-        console.error(error)
-    }
-}
+        return containerData;
+      })
+    );
+
+    const contractData = await SmartContract.get().call(
+      "createRequestDO",
+      doNumber,
+      shippingAgencyData.name,
+      process.env.WALLET_ADDRESS,
+      notifyPartyData.name,
+      consigneeData.name,
+      shipperData.name,
+      portOfLoadingData.name,
+      portOfDischargeData.name,
+      portOfDeliveryData.name,
+      doExpiredDate,
+      containersData
+    );
+
+    console.log("Onchain data created:", contractData);
+
+    const containerData = await Container.bulkCreate(containersModelData);
+    const doData = await DeliveryOrder.create({
+      blockChainId: await DeliveryOrder.count(),
+      shippingAgencyId,
+      notifyPartyId,
+      consigneeId,
+      shipperId,
+      portOfDischargeId,
+      portOfDeliveryId,
+      portOfLoadingId,
+      blNumber,
+      doNumber,
+      doExpiredDate,
+      vessel,
+      voyageNumber,
+      status: "ON PROCESS",
+    });
+    await doData.addContainers(containerData);
+
+    console.log("Offchain data created", doData);
+
+    res.json({ msg: "DO Ditambahkan" });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+exports.getDOs = async (req, res) => {
+  try {
+    const dos = await DeliveryOrder.findAll();
+    res.status(200).json(dos);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 exports.getDepot = async (req, res) => {
-    try {
-        const depot = await depo.findAll({
-            attributes: 'name'
-        })
-        res.status(200).json(depot)
-    } catch (error) {
-        console.log(error)
-    }
-}
+  try {
+    const depot = await depo.findAll({
+      attributes: "name",
+    });
+    res.status(200).json(depot);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 exports.newDepot = async (req, res) => {
+  try {
+    const { name, address } = req.body;
     try {
-        const { name, address } = req.body
-        try {
-            await depo.create({
-                name: name,
-                address: address
-            })
-            res.json({
-                msg: 'New Port addedd'
-            })
-        } catch (error) {
-            console.log(error)
-        }
-
+      await depo.create({
+        name: name,
+        address: address,
+      });
+      res.json({
+        msg: "New Port addedd",
+      });
     } catch (error) {
-        console.log(error)
+      console.error(error);
     }
-}
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 exports.getPort = async (req, res) => {
-    try {
-        const ports = await port.findAll({
-            attributes: 'name'
-        })
-        res.status(200).json(ports)
-    } catch (error) {
-        console.log(error)
-    }
-}
+  try {
+    const ports = await port.findAll({
+      attributes: "name",
+    });
+    res.status(200).json(ports);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 exports.newPort = async (req, res) => {
-    try {
-
-    } catch (error) {
-
-    }
-}
+  try {
+  } catch (error) {}
+};
 
 exports.getShipping = async (req, res) => {
-    try {
-        const agency = await shipping.findAll({
-            attributes: 'name'
-        })
-        res.status(200).json(agency)
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-
-
+  try {
+    const agency = await shipping.findAll({
+      attributes: "name",
+    });
+    res.status(200).json(agency);
+  } catch (error) {
+    console.error(error);
+  }
+};
