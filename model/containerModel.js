@@ -27,7 +27,6 @@ const Container = db.define("Container", {
 
 Container.belongsTo(Company, {
   foreignKey: "depoId",
-  as: "Depo",
 });
 
 module.exports = { Container };

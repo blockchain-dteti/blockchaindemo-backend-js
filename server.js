@@ -8,6 +8,7 @@ const cors = require("cors");
 const db = require("./config/database");
 const accountRoute = require("./routes/loginRouter");
 const doRoute = require("./routes/doRouter");
+const companyRoute = require("./routes/companyRoute");
 const SmartContract = require("./service/thirdweb");
 const { companyInit } = require("./model/companyModel");
 const { portInit } = require("./model/portModel");
@@ -36,6 +37,7 @@ const app = express();
 
   app.use("/api/account", accountRoute);
   app.use("/api/do", doRoute);
+  app.use("/api/company", companyRoute);
 
   app.listen(5000, () => {
     console.log("Server is running");
