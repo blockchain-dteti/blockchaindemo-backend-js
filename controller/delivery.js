@@ -102,8 +102,12 @@ exports.newDO = async (req, res) => {
 
 exports.getDOs = async (req, res) => {
   try {
-    const { includes } = req.query;
-    let include = [];
+    const { id, includes } = req.query;
+    const where = {};
+    const include = [];
+    if (id) {
+      where.id = id;
+    }
     if (includes?.includes("Container")) {
       include.push(Container);
     }
@@ -134,6 +138,7 @@ exports.getDOs = async (req, res) => {
     }
     const dos = await DeliveryOrder.findAll({
       include,
+      where,
     });
     res.status(200).json(dos);
   } catch (error) {
