@@ -20,10 +20,10 @@ exports.newDO = async (req, res) => {
   } = req.body;
   try {
     const doNumber = randomString(10);
-    const blNumber = randomString(14);
-    const voyageNumber = randomString(4);
-    const vessel = "XIN YANG PU";
-    const doExpiredDate = moment().add(1, "month");
+    // const blNumber = randomString(14);
+    // const voyageNumber = randomString(4);
+    // const vessel = "XIN YANG PU";
+    // const doExpiredDate = moment().add(1, "month");
 
     const shippingAgencyData = await ShippingAgency.findByPk(shippingAgencyId);
     const notifyPartyData = await Company.findByPk(notifyPartyId);
@@ -67,7 +67,7 @@ exports.newDO = async (req, res) => {
       portOfLoadingData.name,
       portOfDischargeData.name,
       portOfDeliveryData.name,
-      doExpiredDate,
+      "",
       containersData
     );
 
@@ -83,11 +83,11 @@ exports.newDO = async (req, res) => {
       portOfDischargeId,
       portOfDeliveryId,
       portOfLoadingId,
-      blNumber,
+      blNumber: undefined,
       doNumber,
-      doExpiredDate,
-      vessel,
-      voyageNumber,
+      doExpiredDate: undefined,
+      vessel: undefined,
+      voyageNumber: undefined,
       status: "ON PROCESS",
     });
     await doData.addContainers(containerData);
@@ -102,7 +102,39 @@ exports.newDO = async (req, res) => {
 
 exports.getDOs = async (req, res) => {
   try {
-    const dos = await DeliveryOrder.findAll();
+    const { includes } = req.query;
+    let include = [];
+    if (includes?.includes("Container")) {
+      include.push(Container);
+    }
+    if (includes?.includes("ShippingAgency")) {
+      include.push(ShippingAgency);
+    }
+    if (includes?.includes("NotifyParty")) {
+      include.push({ model: Company, as: "NotifyParty" });
+    }
+    if (includes?.includes("Consignee")) {
+      include.push({ model: Company, as: "Consignee" });
+    }
+    if (includes?.includes("Shipper")) {
+      include.push({ model: Company, as: "Shipper" });
+    }
+    if (includes?.includes("Depo")) {
+      // FIXME: Join Depo to each Container efficiently
+      // include.push({ model: Company, as: "Depo" });
+    }
+    if (includes?.includes("PortOfDischarge")) {
+      include.push({ model: Port, as: "PortOfDischarge" });
+    }
+    if (includes?.includes("PortOfDelivery")) {
+      include.push({ model: Port, as: "PortOfDelivery" });
+    }
+    if (includes?.includes("PortOfLoading")) {
+      include.push({ model: Port, as: "PortOfLoading" });
+    }
+    const dos = await DeliveryOrder.findAll({
+      include,
+    });
     res.status(200).json(dos);
   } catch (error) {
     console.error(error);

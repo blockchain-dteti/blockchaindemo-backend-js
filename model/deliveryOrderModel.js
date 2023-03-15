@@ -40,7 +40,6 @@ const DeliveryOrder = db.define("DeliveryOrder", {
   },
   blNumber: {
     type: DataTypes.STRING,
-    allowNull: false,
   },
   doNumber: {
     type: DataTypes.STRING,
@@ -48,15 +47,12 @@ const DeliveryOrder = db.define("DeliveryOrder", {
   },
   doExpiredDate: {
     type: DataTypes.DATE,
-    allowNull: false,
   },
   vessel: {
     type: DataTypes.STRING,
-    allowNull: false,
   },
   voyageNumber: {
     type: DataTypes.STRING,
-    allowNull: false,
   },
   status: {
     type: DataTypes.ENUM("APPROVED", "REJECTED", "ON PROCESS"),
@@ -69,21 +65,27 @@ DeliveryOrder.belongsTo(ShippingAgency, {
 });
 DeliveryOrder.belongsTo(Company, {
   foreignKey: "notifyPartyId",
+  as: "NotifyParty",
 });
 DeliveryOrder.belongsTo(Company, {
   foreignKey: "consigneeId",
+  as: "Consignee",
 });
 DeliveryOrder.belongsTo(Company, {
   foreignKey: "shipperId",
+  as: "Shipper",
 });
 DeliveryOrder.belongsTo(Port, {
   foreignKey: "portOfDischargeId",
+  as: "PortOfDischarge",
 });
 DeliveryOrder.belongsTo(Port, {
   foreignKey: "portOfDeliveryId",
+  as: "PortOfDelivery",
 });
 DeliveryOrder.belongsTo(Port, {
   foreignKey: "portOfLoadingId",
+  as: "PortOfLoading",
 });
 DeliveryOrder.belongsToMany(Container, {
   through: "DeliveryOrderContainer",
